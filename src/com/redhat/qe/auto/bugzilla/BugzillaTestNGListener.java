@@ -20,9 +20,8 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.testng.internal.IResultListener;
 
-import com.redhat.qe.auto.tcms.AbstractTestProcedureHandler;
-import com.redhat.qe.auto.testng.BzChecker;
 import com.redhat.qe.auto.testng.TestScript;
+import com.redhat.qe.jul.AbstractTestProcedureHandler;
 
 public class BugzillaTestNGListener implements IResultListener, ISuiteListener{
 
