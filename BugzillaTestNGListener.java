@@ -21,8 +21,6 @@ import org.testng.annotations.Test;
 import org.testng.internal.IResultListener;
 
 import com.redhat.qe.auto.tcms.AbstractTestProcedureHandler;
-import com.redhat.qe.auto.testng.BlockedByBzBug;
-import com.redhat.qe.auto.testng.BzBugDependency;
 import com.redhat.qe.auto.testng.BzChecker;
 import com.redhat.qe.auto.testng.TestScript;
 
