@@ -20,8 +20,8 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.testng.internal.IResultListener;
 
-import com.redhat.qe.auto.testng.TestScript;
 import com.redhat.qe.jul.AbstractTestProcedureHandler;
+import com.redhat.qe.auto.testng.TestScript;
 
 public class BugzillaTestNGListener implements IResultListener, ISuiteListener{
 
@@ -81,8 +81,14 @@ public class BugzillaTestNGListener implements IResultListener, ISuiteListener{
 		 * ON_QA, VERIFIED, RELEASE_PENDING, POST, CLOSED then skip it 
 		 */
 		
-		bzChecker = BzChecker.getInstance();
-	
+		// if bzChecker initialization fails, just print it and finish
+		try {
+		    bzChecker = BzChecker.getInstance();
+		}
+		catch (Exception e) {
+		    e.printStackTrace();
+		    return;
+		}
 		String[] groups = result.getMethod().getGroups();
 		
 		Pattern p = Pattern.compile("[" + VERIFIES_BUG + "|" + BLOCKED_BY_BUG +"]-(\\d+)");
@@ -130,7 +136,13 @@ public class BugzillaTestNGListener implements IResultListener, ISuiteListener{
 	
 	@Override
 	public void onTestSuccess(ITestResult result) {
-		bzChecker = BzChecker.getInstance();
+	    // silently skip
+	    try {
+            bzChecker = BzChecker.getInstance();
+        }
+        catch (Exception e) {
+            return;
+        }
 		
 		//FIXME this method needs some work
 		
