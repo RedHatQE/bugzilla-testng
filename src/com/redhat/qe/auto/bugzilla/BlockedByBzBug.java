@@ -1,7 +1,5 @@
 package com.redhat.qe.auto.bugzilla;
 
-import com.redhat.qe.auto.bugzilla.BzBugDependency.Type;
-
 /**
  * Use this class when you want to mark a row in a testNG DataProvider
  * as blocked by a bug in bugzilla.  The proper way to mark the 
