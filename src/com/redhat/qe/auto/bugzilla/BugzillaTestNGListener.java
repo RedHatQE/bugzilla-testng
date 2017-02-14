@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.xmlrpc.XmlRpcException;
 import org.testng.ISuite;
 import org.testng.ISuiteListener;
 import org.testng.ITestContext;
@@ -22,6 +21,10 @@ import org.testng.internal.IResultListener;
 
 import com.redhat.qe.jul.AbstractTestProcedureHandler;
 import com.redhat.qe.auto.testng.TestScript;
+
+import com.redhat.qe.auto.bugzilla.BzChecker;
+import com.redhat.qe.auto.bugzilla.OldBzChecker;
+import com.redhat.qe.auto.bugzilla.IBugzillaAPI;
 
 public class BugzillaTestNGListener implements IResultListener, ISuiteListener{
 
@@ -83,7 +86,7 @@ public class BugzillaTestNGListener implements IResultListener, ISuiteListener{
 		
 		// if bzChecker initialization fails, just print it and finish
 		try {
-		    bzChecker = BzChecker.getInstance();
+		    bzChecker = OldBzChecker.getInstance();
 		}
 		catch (Exception e) {
 		    e.printStackTrace();
@@ -111,15 +114,15 @@ public class BugzillaTestNGListener implements IResultListener, ISuiteListener{
 	}
 
 	protected void lookupBugAndSkipIfOpen(String bugId){
-		BzChecker.bzState state;
+		IBugzillaAPI.bzState state;
 		String summary;
 		boolean isBugOpen;
 		try {
 			state = bzChecker.getBugState(bugId);
 			summary = bzChecker.getBugField(bugId, "summary").toString();
 			isBugOpen = bzChecker.isBugOpen(bugId);
-		} catch(XmlRpcException xre) {
-			log.log(Level.WARNING, "Could not determine the state of Bugzilla bug "+bugId+". Assuming test needs to be run.", xre);
+		} catch(Exception ex) {
+			log.log(Level.WARNING, "Could not determine the state of Bugzilla bug "+bugId+". Assuming test needs to be run.", ex);
 			return;
 		}
 		
@@ -138,7 +141,7 @@ public class BugzillaTestNGListener implements IResultListener, ISuiteListener{
 	public void onTestSuccess(ITestResult result) {
 	    // silently skip
 	    try {
-            bzChecker = BzChecker.getInstance();
+            bzChecker = OldBzChecker.getInstance();
         }
         catch (Exception e) {
             return;
@@ -153,17 +156,17 @@ public class BugzillaTestNGListener implements IResultListener, ISuiteListener{
 			Matcher m = p.matcher(group);
 			if (m.find()){
 				String number = m.group(1);
-				BzChecker.bzState state;
+				IBugzillaAPI.bzState state;
 				try {
 					state = bzChecker.getBugState(number);
 				}
-				catch(XmlRpcException xre) {
-					log.log(Level.WARNING, "Could not determine the state of bug " + number + ". It may need to be closed if is hasn't been already.", xre);
+				catch(Exception ex) {
+					log.log(Level.WARNING, "Could not determine the state of bug " + number + ". It may need to be closed if is hasn't been already.", ex);
 					break;
 				}
 				if (group.startsWith(VERIFIES_BUG)) {
 					log.fine("This test verifies bugzilla bug #"+ number);
-					if (state.equals(BzChecker.bzState.ON_QA)){
+					if (state.equals(IBugzillaAPI.bzState.ON_QA)){
 						//TODO need to call code here to actually close the bug (doesn't work yet)
 						log.warning("Need to verify bug " + number + "!");
 						/*
