@@ -1,4 +1,4 @@
-(defproject com.redhat.qe/bugzilla-testng "1.1.2-SNAPSHOT"
+(defproject com.redhat.qe/bugzilla-testng "1.1.3-SNAPSHOT"
   :description "Bugzilla integration for TestNG tests - check if a bz is open before running a test."
   :java-source-path "src"
   :dependencies [[com.redhat.qe/bz-checker "2.0.3-SNAPSHOT"]
