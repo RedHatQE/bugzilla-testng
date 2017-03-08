@@ -1,4 +1,4 @@
-(defproject com.redhat.qe/bugzilla-testng "1.1.4-SNAPSHOT"
+(defproject com.redhat.qe/bugzilla-testng "1.2.4-SNAPSHOT"
   :description "Bugzilla integration for TestNG tests - check if a bz is open before running a test."
   :url "https://github.com/RedHatQE/bugzilla-testng"
   :java-source-path "src"

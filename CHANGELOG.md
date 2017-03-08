@@ -1,6 +1,6 @@
 # Change Log
 
-## [1.1.4-SNAPSHOT] - 2017-03-08
+## [1.2.4-SNAPSHOT] - 2017-03-08
 
 ### Changed
 
