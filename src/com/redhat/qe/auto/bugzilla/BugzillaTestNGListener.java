@@ -23,7 +23,6 @@ import com.redhat.qe.jul.AbstractTestProcedureHandler;
 import com.redhat.qe.auto.testng.TestScript;
 
 import com.redhat.qe.auto.bugzilla.BzChecker;
-import com.redhat.qe.auto.bugzilla.OldBzChecker;
 import com.redhat.qe.auto.bugzilla.IBugzillaAPI;
 
 public class BugzillaTestNGListener implements IResultListener, ISuiteListener{
@@ -86,7 +85,7 @@ public class BugzillaTestNGListener implements IResultListener, ISuiteListener{
 		
 		// if bzChecker initialization fails, just print it and finish
 		try {
-		    bzChecker = OldBzChecker.getInstance();
+		    bzChecker = BzChecker.getInstance();
 		}
 		catch (Exception e) {
 		    e.printStackTrace();
@@ -141,7 +140,7 @@ public class BugzillaTestNGListener implements IResultListener, ISuiteListener{
 	public void onTestSuccess(ITestResult result) {
 	    // silently skip
 	    try {
-            bzChecker = OldBzChecker.getInstance();
+            bzChecker = BzChecker.getInstance();
         }
         catch (Exception e) {
             return;
