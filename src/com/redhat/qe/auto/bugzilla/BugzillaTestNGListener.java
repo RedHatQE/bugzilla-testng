@@ -24,6 +24,7 @@ import com.redhat.qe.auto.testng.TestScript;
 
 import com.redhat.qe.auto.bugzilla.BzChecker;
 import com.redhat.qe.auto.bugzilla.IBugzillaAPI;
+import com.redhat.qe.auto.bugzilla.BugzillaAPIException;
 
 public class BugzillaTestNGListener implements IResultListener, ISuiteListener{
 
@@ -87,8 +88,8 @@ public class BugzillaTestNGListener implements IResultListener, ISuiteListener{
 		try {
 		    bzChecker = BzChecker.getInstance();
 		}
-		catch (Exception e) {
-		    e.printStackTrace();
+		catch (RuntimeException re) {
+		    re.printStackTrace();
 		    return;
 		}
 		String[] groups = result.getMethod().getGroups();
@@ -120,8 +121,8 @@ public class BugzillaTestNGListener implements IResultListener, ISuiteListener{
 			state = bzChecker.getBugState(bugId);
 			summary = bzChecker.getBugField(bugId, "summary").toString();
 			isBugOpen = bzChecker.isBugOpen(bugId);
-		} catch(Exception ex) {
-			log.log(Level.WARNING, "Could not determine the state of Bugzilla bug "+bugId+". Assuming test needs to be run.", ex);
+		} catch(BugzillaAPIException be) {
+			log.log(Level.WARNING, "Could not determine the state of Bugzilla bug "+bugId+". Assuming test needs to be run.", be);
 			return;
 		}
 		
@@ -142,7 +143,7 @@ public class BugzillaTestNGListener implements IResultListener, ISuiteListener{
 	    try {
             bzChecker = BzChecker.getInstance();
         }
-        catch (Exception e) {
+      catch (RuntimeException re) {
             return;
         }
 		
@@ -159,8 +160,8 @@ public class BugzillaTestNGListener implements IResultListener, ISuiteListener{
 				try {
 					state = bzChecker.getBugState(number);
 				}
-				catch(Exception ex) {
-					log.log(Level.WARNING, "Could not determine the state of bug " + number + ". It may need to be closed if is hasn't been already.", ex);
+				catch(BugzillaAPIException be) {
+					log.log(Level.WARNING, "Could not determine the state of bug " + number + ". It may need to be closed if is hasn't been already.", be);
 					break;
 				}
 				if (group.startsWith(VERIFIES_BUG)) {
@@ -220,8 +221,8 @@ public class BugzillaTestNGListener implements IResultListener, ISuiteListener{
 					log.info("Bug " + bugNumber + " already has the AutoVerified keyword.");
 					return;
 				}
-			} catch(Exception e) {
-				log.log(Level.WARNING, "Could not determine if bug " + bugNumber + " has been marked AutoVerified yet.",e);
+			} catch(BugzillaAPIException be) {
+				log.log(Level.WARNING, "Could not determine if bug " + bugNumber + " has been marked AutoVerified yet.",be);
 			}
 			StringBuffer sb = new StringBuffer();
 			bzChecker.login(System.getProperty("bugzilla.login"), System.getProperty("bugzilla.password"));
