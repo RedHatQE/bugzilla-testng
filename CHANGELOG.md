@@ -5,3 +5,4 @@
 ### Changed
 
 - a static factory `OldBzChecker` renamed to `BzChecker`
+- a code `catch XmlRpcException` was updated to `catch BugzillaAPIException`
