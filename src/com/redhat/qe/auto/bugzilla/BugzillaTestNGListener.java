@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.xmlrpc.XmlRpcException;
 import org.testng.ISuite;
 import org.testng.ISuiteListener;
 import org.testng.ITestContext;
@@ -22,6 +21,10 @@ import org.testng.internal.IResultListener;
 
 import com.redhat.qe.jul.AbstractTestProcedureHandler;
 import com.redhat.qe.auto.testng.TestScript;
+
+import com.redhat.qe.auto.bugzilla.BzChecker;
+import com.redhat.qe.auto.bugzilla.IBugzillaAPI;
+import com.redhat.qe.auto.bugzilla.BugzillaAPIException;
 
 public class BugzillaTestNGListener implements IResultListener, ISuiteListener{
 
@@ -85,8 +88,8 @@ public class BugzillaTestNGListener implements IResultListener, ISuiteListener{
 		try {
 		    bzChecker = BzChecker.getInstance();
 		}
-		catch (Exception e) {
-		    e.printStackTrace();
+		catch (RuntimeException re) {
+		    re.printStackTrace();
 		    return;
 		}
 		String[] groups = result.getMethod().getGroups();
@@ -111,15 +114,15 @@ public class BugzillaTestNGListener implements IResultListener, ISuiteListener{
 	}
 
 	protected void lookupBugAndSkipIfOpen(String bugId){
-		BzChecker.bzState state;
+		IBugzillaAPI.bzState state;
 		String summary;
 		boolean isBugOpen;
 		try {
 			state = bzChecker.getBugState(bugId);
 			summary = bzChecker.getBugField(bugId, "summary").toString();
 			isBugOpen = bzChecker.isBugOpen(bugId);
-		} catch(XmlRpcException xre) {
-			log.log(Level.WARNING, "Could not determine the state of Bugzilla bug "+bugId+". Assuming test needs to be run.", xre);
+		} catch(BugzillaAPIException be) {
+			log.log(Level.WARNING, "Could not determine the state of Bugzilla bug "+bugId+". Assuming test needs to be run.", be);
 			return;
 		}
 		
@@ -140,7 +143,7 @@ public class BugzillaTestNGListener implements IResultListener, ISuiteListener{
 	    try {
             bzChecker = BzChecker.getInstance();
         }
-        catch (Exception e) {
+      catch (RuntimeException re) {
             return;
         }
 		
@@ -153,17 +156,17 @@ public class BugzillaTestNGListener implements IResultListener, ISuiteListener{
 			Matcher m = p.matcher(group);
 			if (m.find()){
 				String number = m.group(1);
-				BzChecker.bzState state;
+				IBugzillaAPI.bzState state;
 				try {
 					state = bzChecker.getBugState(number);
 				}
-				catch(XmlRpcException xre) {
-					log.log(Level.WARNING, "Could not determine the state of bug " + number + ". It may need to be closed if is hasn't been already.", xre);
+				catch(BugzillaAPIException be) {
+					log.log(Level.WARNING, "Could not determine the state of bug " + number + ". It may need to be closed if is hasn't been already.", be);
 					break;
 				}
 				if (group.startsWith(VERIFIES_BUG)) {
 					log.fine("This test verifies bugzilla bug #"+ number);
-					if (state.equals(BzChecker.bzState.ON_QA)){
+					if (state.equals(IBugzillaAPI.bzState.ON_QA)){
 						//TODO need to call code here to actually close the bug (doesn't work yet)
 						log.warning("Need to verify bug " + number + "!");
 						/*
@@ -218,8 +221,8 @@ public class BugzillaTestNGListener implements IResultListener, ISuiteListener{
 					log.info("Bug " + bugNumber + " already has the AutoVerified keyword.");
 					return;
 				}
-			} catch(Exception e) {
-				log.log(Level.WARNING, "Could not determine if bug " + bugNumber + " has been marked AutoVerified yet.",e);
+			} catch(BugzillaAPIException be) {
+				log.log(Level.WARNING, "Could not determine if bug " + bugNumber + " has been marked AutoVerified yet.",be);
 			}
 			StringBuffer sb = new StringBuffer();
 			bzChecker.login(System.getProperty("bugzilla.login"), System.getProperty("bugzilla.password"));
